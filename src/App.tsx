@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function CreditCalculator() {
   const [amount, setAmount] = useState(10000);
@@ -61,7 +61,7 @@ export default function CreditCalculator() {
     <div className="flex justify-center w-dvw">
       <div className="max-w-2xl mx-auto p-6 bg-gray rounded-2xl shadow-md">
         <h1 className="text-2xl font-bold mb-4 text-center">
-          Kalkulator kredytu (RRSO)
+          Kalkulator kredytu (RRSO), czyli jak dyma nas bank
         </h1>
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div>
