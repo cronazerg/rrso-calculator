@@ -1,9 +1,11 @@
 import { useState } from 'react';
 
 export default function CreditCalculator() {
-  const [amount, setAmount] = useState(10000);
-  const [months, setMonths] = useState(36);
-  const [rrso, setRrso] = useState(10);
+  const [amount, setAmount] = useState<string | number>(10000);
+  const [months, setMonths] = useState<string | number>(36);
+  const [rrso, setRrso] = useState<string | number>(10);
+  const [totalPaid, setTotalPaid] = useState(0);
+  const [totalInterest, setTotalInterest] = useState(0);
   const [schedule, setSchedule] = useState<
     {
       month: number;
@@ -21,7 +23,7 @@ export default function CreditCalculator() {
     });
   };
 
-  const calculate = () => {
+  const calculate = async () => {
     const convertedAmount = amount.toString();
     const convertedMonths = months.toString();
     const convertedRrso = rrso.toString();
@@ -31,7 +33,6 @@ export default function CreditCalculator() {
 
     if (!principal || !rate || !n) return;
 
-    // wzór na ratę annuitetową
     const monthlyPayment =
       (principal * rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1);
 
@@ -52,10 +53,15 @@ export default function CreditCalculator() {
     }
 
     setSchedule(scheduleData);
-  };
 
-  const totalPaid = schedule.reduce((sum, r) => sum + r.payment, 0);
-  const totalInterest = totalPaid - amount;
+    if (scheduleData.length > 0) {
+      const totalPaid = scheduleData.reduce((sum, r) => sum + r.payment, 0);
+      const totalInterest = totalPaid - Number(amount);
+
+      setTotalPaid(totalPaid);
+      setTotalInterest(totalInterest);
+    }
+  };
 
   return (
     <div className="flex justify-center w-dvw">
@@ -70,7 +76,7 @@ export default function CreditCalculator() {
               type="number"
               className="border p-2 rounded w-full"
               value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
+              onChange={(e) => setAmount(String(e.target.value))}
             />
           </div>
           <div>
@@ -79,7 +85,7 @@ export default function CreditCalculator() {
               type="number"
               className="border p-2 rounded w-full"
               value={months}
-              onChange={(e) => setMonths(Number(e.target.value))}
+              onChange={(e) => setMonths(String(e.target.value))}
             />
           </div>
           <div>
@@ -88,7 +94,7 @@ export default function CreditCalculator() {
               type="number"
               className="border p-2 rounded w-full"
               value={rrso}
-              onChange={(e) => setRrso(Number(e.target.value))}
+              onChange={(e) => setRrso(String(e.target.value))}
             />
           </div>
         </div>
@@ -107,7 +113,7 @@ export default function CreditCalculator() {
                 Miesięczna rata: {formatNumber(schedule[0].payment)} zł
               </p>
               <p>Całkowity koszt: {formatNumber(totalPaid)} zł</p>
-              <p>Odsetki: {formatNumber(totalInterest)} zł</p>
+              <b>Odsetki: {formatNumber(totalInterest)} zł - na tyle dyma</b>
             </div>
 
             <table className="w-full text-sm border-t">
