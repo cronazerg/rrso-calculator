@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
 export default function CreditCalculator() {
-  const [amount, setAmount] = useState<string | number>(10000);
-  const [months, setMonths] = useState<string | number>(36);
-  const [rrso, setRrso] = useState<string | number>(10);
+  const [amount, setAmount] = useState<number>(10000);
+  const [months, setMonths] = useState<number>(36);
+  const [rrso, setRrso] = useState<number>(10);
+  const [overpayment, setOverpayment] = useState<number>(0);
   const [totalPaid, setTotalPaid] = useState(0);
   const [totalInterest, setTotalInterest] = useState(0);
   const [schedule, setSchedule] = useState<
@@ -23,15 +24,21 @@ export default function CreditCalculator() {
     });
   };
 
-  const calculate = async () => {
-    const convertedAmount = amount.toString();
-    const convertedMonths = months.toString();
-    const convertedRrso = rrso.toString();
-    const principal = parseFloat(convertedAmount);
-    const rate = parseFloat(convertedRrso) / 100 / 12; // miesięczne oprocentowanie
-    const n = parseInt(convertedMonths);
+  const calculate = () => {
+    if (
+      amount === null ||
+      months === null ||
+      rrso === null ||
+      overpayment === null
+    )
+      return;
 
-    if (!principal || !rate || !n) return;
+    const overpaymentValue = overpayment;
+    const principal = amount;
+    const rate = rrso / 100 / 12;
+    const n = months;
+
+    if (principal <= 0 || rate <= 0 || n <= 0) return;
 
     const monthlyPayment =
       (principal * rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1);
@@ -39,13 +46,18 @@ export default function CreditCalculator() {
     let remaining = principal;
     const scheduleData = [];
 
-    for (let i = 1; i <= n; i++) {
+    for (let i = 1; i <= n && remaining > 0; i++) {
       const interest = remaining * rate;
-      const capital = monthlyPayment - interest;
+      const capital = Math.min(
+        remaining,
+        Math.max(monthlyPayment + overpaymentValue - interest, 0)
+      );
+      // actual payment is the sum of interest and capital (final payment may be smaller)
+      const payment = interest + capital;
       remaining -= capital;
       scheduleData.push({
         month: i,
-        payment: monthlyPayment,
+        payment,
         interest,
         capital,
         remaining: remaining > 0 ? remaining : 0,
@@ -54,13 +66,11 @@ export default function CreditCalculator() {
 
     setSchedule(scheduleData);
 
-    if (scheduleData.length > 0) {
-      const totalPaid = scheduleData.reduce((sum, r) => sum + r.payment, 0);
-      const totalInterest = totalPaid - Number(amount);
+    const totalPaid = scheduleData.reduce((sum, r) => sum + r.payment, 0);
+    const totalInterest = totalPaid - principal;
 
-      setTotalPaid(totalPaid);
-      setTotalInterest(totalInterest);
-    }
+    setTotalPaid(totalPaid);
+    setTotalInterest(totalInterest);
   };
 
   return (
@@ -76,7 +86,7 @@ export default function CreditCalculator() {
               type="number"
               className="border p-2 rounded w-full"
               value={amount}
-              onChange={(e) => setAmount(String(e.target.value))}
+              onChange={(e) => setAmount(Number(e.target.value))}
             />
           </div>
           <div>
@@ -85,7 +95,7 @@ export default function CreditCalculator() {
               type="number"
               className="border p-2 rounded w-full"
               value={months}
-              onChange={(e) => setMonths(String(e.target.value))}
+              onChange={(e) => setMonths(Number(e.target.value))}
             />
           </div>
           <div>
@@ -94,7 +104,19 @@ export default function CreditCalculator() {
               type="number"
               className="border p-2 rounded w-full"
               value={rrso}
-              onChange={(e) => setRrso(String(e.target.value))}
+              onChange={(e) => setRrso(Number(e.target.value))}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold">
+              Cyklicznie nadpłacanie (zł)
+            </label>
+            <input
+              type="number"
+              className="border p-2 rounded w-full"
+              value={overpayment}
+              onChange={(e) => setOverpayment(Number(e.target.value))}
             />
           </div>
         </div>
