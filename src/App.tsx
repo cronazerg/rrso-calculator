@@ -27,6 +27,7 @@ export default function CreditCalculator() {
   const [schedule, setSchedule] = useState<ScheduleRow[]>([]);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [theme, setTheme] = useState<Theme>('light');
+  const [useYears, setUseYears] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') as Theme;
@@ -48,6 +49,7 @@ export default function CreditCalculator() {
 
   const validate = (): boolean => {
     const newErrors: ValidationErrors = {};
+    const periodValue = useYears ? months * 12 : months;
 
     if (amount <= 0) {
       newErrors.amount = 'Kwota musi być większa od 0';
@@ -55,9 +57,9 @@ export default function CreditCalculator() {
       newErrors.amount = 'Maksymalna kwota to 10 000 000 zł';
     }
 
-    if (months <= 0) {
+    if (periodValue <= 0) {
       newErrors.months = 'Okres musi być większy od 0';
-    } else if (months > 600) {
+    } else if (periodValue > 600) {
       newErrors.months = 'Maksymalny okres to 600 miesięcy';
     }
 
@@ -75,6 +77,14 @@ export default function CreditCalculator() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleMonthsChange = (value: number) => {
+    setMonths(value);
+  };
+
+  const getPeriodLabel = () => useYears ? 'Okres (lat)' : 'Okres (mies.)';
+
+  const getPeriodPlaceholder = () => useYears ? 'Lata' : 'Miesiące';
+
   const formatNumber = (num: number) => {
     return num.toLocaleString('pl-PL', {
       minimumFractionDigits: 2,
@@ -88,7 +98,7 @@ export default function CreditCalculator() {
     const overpaymentValue = overpayment;
     const principal = amount;
     const rate = rrso / 100 / 12;
-    const n = months;
+    const n = useYears ? months * 12 : months;
 
     if (principal <= 0 || n <= 0) return;
 
@@ -182,13 +192,14 @@ export default function CreditCalculator() {
             {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
           </div>
           <div>
-            <label htmlFor="months" className={`block text-sm font-semibold mb-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>Okres (mies.)</label>
+            <label htmlFor="months" className={`block text-sm font-semibold mb-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>{getPeriodLabel()}</label>
             <input
               id="months"
               type="number"
+              placeholder={getPeriodPlaceholder()}
               className={`border p-2 rounded w-full ${errors.months ? 'border-red-500' : 'border-gray-300'} ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
               value={months}
-              onChange={(e) => setMonths(Number(e.target.value))}
+              onChange={(e) => handleMonthsChange(Number(e.target.value))}
             />
             {errors.months && <p className="text-red-500 text-xs mt-1">{errors.months}</p>}
           </div>
@@ -217,6 +228,19 @@ export default function CreditCalculator() {
             />
             {errors.overpayment && <p className="text-red-500 text-xs mt-1">{errors.overpayment}</p>}
           </div>
+        </div>
+
+        <div className="flex items-center gap-2 mb-4">
+          <input
+            id="useYears"
+            type="checkbox"
+            checked={useYears}
+            onChange={(e) => setUseYears(e.target.checked)}
+            className="w-4 h-4"
+          />
+          <label htmlFor="useYears" className={`text-sm ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
+            Podaj okres w latach
+          </label>
         </div>
 
         <button
@@ -249,21 +273,21 @@ export default function CreditCalculator() {
               <table className="w-full text-sm border-t">
                 <thead>
                   <tr className={theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-slate-700 text-white'}>
-                    <th className="p-2">Miesiąc</th>
-                    <th className="p-2">Rata</th>
-                    <th className="p-2">Kapitał</th>
-                    <th className="p-2">Odsetki</th>
-                    <th className="p-2">Saldo</th>
+                    <th className="p-2 text-center">Miesiąc</th>
+                    <th className="p-2 text-center">Rata</th>
+                    <th className="p-2 text-center">Kapitał</th>
+                    <th className="p-2 text-center">Odsetki</th>
+                    <th className="p-2 text-center">Saldo</th>
                   </tr>
                 </thead>
                 <tbody>
                   {schedule.map((row) => (
                     <tr key={row.month} className={`border-t ${theme === 'dark' ? 'border-gray-600 text-white' : 'border-gray-300 text-gray-800'}`}>
-                      <td className="p-2">{row.month}</td>
-                      <td className="p-2">{formatNumber(row.payment)}</td>
-                      <td className="p-2">{formatNumber(row.capital)}</td>
-                      <td className="p-2">{formatNumber(row.interest)}</td>
-                      <td className="p-2">{formatNumber(row.remaining)}</td>
+                      <td className="p-2 text-center">{row.month}</td>
+                      <td className="p-2 text-center">{formatNumber(row.payment)}</td>
+                      <td className="p-2 text-center">{formatNumber(row.capital)}</td>
+                      <td className="p-2 text-center">{formatNumber(row.interest)}</td>
+                      <td className="p-2 text-center">{formatNumber(row.remaining)}</td>
                     </tr>
                   ))}
                 </tbody>
