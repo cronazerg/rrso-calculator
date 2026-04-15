@@ -154,15 +154,15 @@ export default function CreditCalculator() {
   };
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'} flex justify-center items-start py-8`}>
-      <div className={`max-w-2xl mx-auto p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md w-full mx-4`}>
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-slate-200'} flex justify-center items-start py-8`}>
+      <div className={`max-w-2xl mx-auto p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md w-full mx-4 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-center flex-1">
+          <h1 className={`text-2xl font-bold text-center flex-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Kalkulator kredytu (RRSO)
           </h1>
           <button
             onClick={toggleTheme}
-            className={`p-2 rounded-full ${theme === 'dark' ? 'bg-yellow-500' : 'bg-gray-700'} text-white`}
+            className={`p-2 rounded-full ${theme === 'dark' ? 'bg-yellow-500' : 'bg-gray-600'} text-white`}
             aria-label="Zmień motyw"
           >
             {theme === 'dark' ? '☀️' : '🌙'}
@@ -171,47 +171,47 @@ export default function CreditCalculator() {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div>
-            <label htmlFor="amount" className="block text-sm font-semibold mb-1">Kwota (zł)</label>
+            <label htmlFor="amount" className={`block text-sm font-semibold mb-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>Kwota (zł)</label>
             <input
               id="amount"
               type="number"
-              className={`border p-2 rounded w-full ${errors.amount ? 'border-red-500' : ''}`}
+              className={`border p-2 rounded w-full ${errors.amount ? 'border-red-500' : 'border-gray-300'} ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value))}
             />
             {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
           </div>
           <div>
-            <label htmlFor="months" className="block text-sm font-semibold mb-1">Okres (mies.)</label>
+            <label htmlFor="months" className={`block text-sm font-semibold mb-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>Okres (mies.)</label>
             <input
               id="months"
               type="number"
-              className={`border p-2 rounded w-full ${errors.months ? 'border-red-500' : ''}`}
+              className={`border p-2 rounded w-full ${errors.months ? 'border-red-500' : 'border-gray-300'} ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
               value={months}
               onChange={(e) => setMonths(Number(e.target.value))}
             />
             {errors.months && <p className="text-red-500 text-xs mt-1">{errors.months}</p>}
           </div>
           <div>
-            <label htmlFor="rrso" className="block text-sm font-semibold mb-1">RRSO (%)</label>
+            <label htmlFor="rrso" className={`block text-sm font-semibold mb-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>RRSO (%)</label>
             <input
               id="rrso"
               type="number"
               step="0.01"
-              className={`border p-2 rounded w-full ${errors.rrso ? 'border-red-500' : ''}`}
+              className={`border p-2 rounded w-full ${errors.rrso ? 'border-red-500' : 'border-gray-300'} ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
               value={rrso}
               onChange={(e) => setRrso(Number(e.target.value))}
             />
             {errors.rrso && <p className="text-red-500 text-xs mt-1">{errors.rrso}</p>}
           </div>
           <div>
-            <label htmlFor="overpayment" className="block text-sm font-semibold mb-1">
+            <label htmlFor="overpayment" className={`block text-sm font-semibold mb-1 ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}>
               Nadpłata (zł)
             </label>
             <input
               id="overpayment"
               type="number"
-              className={`border p-2 rounded w-full ${errors.overpayment ? 'border-red-500' : ''}`}
+              className={`border p-2 rounded w-full ${errors.overpayment ? 'border-red-500' : 'border-gray-300'} ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
               value={overpayment}
               onChange={(e) => setOverpayment(Number(e.target.value))}
             />
@@ -229,10 +229,10 @@ export default function CreditCalculator() {
         {schedule.length > 0 && (
           <div>
             <div className="mb-4 text-center">
-              <p className="font-semibold text-lg">
+              <p className={`font-semibold text-lg ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
                 Miesięczna rata: {formatNumber(schedule[0].payment)} zł
               </p>
-              <p>Całkowity koszt: {formatNumber(totalPaid)} zł</p>
+              <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Całkowity koszt: {formatNumber(totalPaid)} zł</p>
               <p className="font-bold text-red-600">Odsetki: {formatNumber(totalInterest)} zł</p>
             </div>
 
@@ -248,7 +248,7 @@ export default function CreditCalculator() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-t">
                 <thead>
-                  <tr className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-700 text-white'}>
+                  <tr className={theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-slate-700 text-white'}>
                     <th className="p-2">Miesiąc</th>
                     <th className="p-2">Rata</th>
                     <th className="p-2">Kapitał</th>
@@ -258,7 +258,7 @@ export default function CreditCalculator() {
                 </thead>
                 <tbody>
                   {schedule.map((row) => (
-                    <tr key={row.month} className="border-t text-center">
+                    <tr key={row.month} className={`border-t ${theme === 'dark' ? 'border-gray-600 text-white' : 'border-gray-300 text-gray-800'}`}>
                       <td className="p-2">{row.month}</td>
                       <td className="p-2">{formatNumber(row.payment)}</td>
                       <td className="p-2">{formatNumber(row.capital)}</td>
